@@ -15,8 +15,41 @@ plan("test") = TestTask(SourceFiles = "tbx", TestResults = "tests/report.html", 
 plan.DefaultTasks = "archive";
 
 % Make the "archive" task dependent on the "check" and "test" tasks
-plan("archive").Dependencies = ["check" "test"];
+plan("archive").Dependencies = ["check" "test", "doc"];
 end
+
+function docTask(~)
+
+if isempty(ver('docmaker'))
+    websave('MATLAB_DocMaker.mltbx','https://github.com/mathworks/docmaker/releases/latest/download/MATLAB_DocMaker.mltbx')
+    matlab.addons.install('MATLAB_DocMaker.mltbx');
+    delete('MATLAB_DocMaker.mltbx');
+end
+
+docin = fullfile('tbx', 'doc');
+docout = fullfile('tbx', 'docmakerdoc');
+if ~isfolder(docout)
+    mkdir(docout) % make destination folder
+end
+
+docdelete(docout)
+
+export(fullfile(docin, 'GettingStarted.m'), fullfile(docin, 'GettingStarted.md'));
+
+md = fullfile(docin,"**","*.md"); % Markdown documents
+
+[html,res] = docconvert(md); % convert to HTML
+
+docrun(html) % run code and insert output
+[xml,db] = docindex(doc); % index
+
+
+arrayfun(@movefile,html,fullfile(docout,extractAfter(html,docin))) % move HTML documents
+movefile(res,fullfile(docout,extractAfter(res,docin))) % move resources folder
+arrayfun(@movefile,xml,fullfile(docout,extractAfter(xml,docin))) % move index files
+movefile(db,fullfile(docout,extractAfter(db,docin))) % move search database folder
+
+end 
 
 function archiveTask(~)
 here = fileparts(mfilename('fullpath'));

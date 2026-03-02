@@ -1,6 +1,10 @@
 .buildtool
 derived/
-tests/release/
+
 releases/
+
+tbx/docmakerdoc
+
+tests/release/
 tests/coverage.html
 tests/report.html
