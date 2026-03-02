@@ -9,7 +9,7 @@ setDynare('6.5')
 %[text] - **`uninstallDynare(<version>)`**: Completely removes the version of Dynare from your computer \
 %[text] Please note that if you install Dynare separately the toolbox attempts to help, but the results can be wrong
 %%
-%[text] ## Running Dynare in Parallel
+%[text] ## Speeding up Dynare estimations with Parallel computing 
 %[text] To make it easier, try first running the model like this (you need to [start a parallel environment ](internal:H_1c5d)first)
 %[text] ```matlabCodeExample
 %[text] dynareParallel('yourModFile.mod')

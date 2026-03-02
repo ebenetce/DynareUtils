@@ -1,4 +1,4 @@
-function setDynare(version)
+function setDynare(version, nvp)
     % SETDYNARE Function to set the specified version of Dynare
     %
     % Input Arguments:
@@ -8,6 +8,7 @@ function setDynare(version)
     
     arguments
         version (1,1) string = string(missing) % Define version argument with default
+        nvp.ZipTool (1,1) string = "C:\Program Files\7-Zip\7z.exe"
     end
     clear mex %#ok<CLMEX>
     
@@ -32,7 +33,7 @@ function setDynare(version)
     if isempty(isVersionAvailable)
         try
             % Install if not available
-            dynutil.downloadAndInstall(version) % Download and install the specified version
+            dynutil.downloadAndInstall(version, ZipTool = nvp.ZipTool) % Download and install the specified version
         catch e
             error('Error downloading Dynare. Please check the <a href="matlab:dynutil.getAllDynareVersions">available dynare versions</a>\n\nThe actual error was %s\n', e.message);            
         end

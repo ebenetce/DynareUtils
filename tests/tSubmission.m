@@ -3,7 +3,7 @@ classdef tSubmission < matlab.unittest.TestCase
     methods (Test)
         % Test methods           
         function tSubmitJob(testCase)
-            setDynare('6.3')
+            setDynare('6.5')
             c = parcluster('local');
             c.NumThreads = 2;
 
@@ -14,7 +14,7 @@ classdef tSubmission < matlab.unittest.TestCase
 
             j2 = batch(c, @runDynareModel, {which("fs2000.mod"), "DynareFlags", ["nograph", "nolog"], ...
                 "AttachedFiles", {which("fs2000_nonstationary.mod"), which("fs2000_data.m")}});
-            
+
             cObj1 = onCleanup(@() delete(j1));
             cObj2 = onCleanup(@() delete(j2));
             wait(j1)

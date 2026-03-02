@@ -2,7 +2,7 @@ classdef tOptim < matlab.unittest.TestCase
 
     methods (TestClassSetup)
         function startParallelEnv(~)
-            setDynare('6.3')
+            setDynare('6.5')
             if isempty(gcp("nocreate"))
                 parpool('Processes');
             end

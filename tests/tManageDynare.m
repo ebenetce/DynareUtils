@@ -10,8 +10,8 @@ classdef tManageDynare < matlab.unittest.TestCase
             tc.verifyEqual(dynare_version, '4.6.3')
             uninstallDynare('4.6.3')
             tc.verifyEmpty(which('dynare_version'))
-            setDynare('6.3')
-            tc.verifyEqual(dynare_version, '6.3')
+            setDynare()
+            tc.verifyEqual(dynare_version, '6.5')
         end
     end
 end

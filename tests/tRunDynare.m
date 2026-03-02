@@ -2,7 +2,7 @@ classdef tRunDynare < matlab.unittest.TestCase
 
     methods (TestClassSetup)
         function startParallelEnv(~)
-            setDynare('6.3')
+            setDynare('6.5')
             c = parcluster('local');
             c.NumThreads = 2;
             if isempty(gcp("nocreate"))
