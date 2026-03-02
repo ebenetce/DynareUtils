@@ -41,7 +41,7 @@ md = fullfile(docin,"**","*.md"); % Markdown documents
 [html,res] = docconvert(md); % convert to HTML
 
 docrun(html) % run code and insert output
-[xml,db] = docindex(doc); % index
+[xml,db] = docindex(docin); % index
 
 
 arrayfun(@movefile,html,fullfile(docout,extractAfter(html,docin))) % move HTML documents
