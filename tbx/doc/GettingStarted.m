@@ -51,7 +51,7 @@ setDynare('6.5')
 %[text] out = dynareParallel('model_file.mod')
 %[text] ```
 %%
-%[text] ## Running Dynare jobs
+%[text] ## Running Dynare jobs and experiments
 %[text] There are multiple ways to submit Dynare jobs and it greatly depends on whether you do it locally or in a cluster. 
 %[text] **Note:** If you want to run Dynare in parallel using Jobs, please consider using Dynare 7 or newer
 %[text] ### Local machine
@@ -71,25 +71,23 @@ setDynare('6.5')
 %[text] If you have selected "**`CollectResultsFolder = true`**" the folder with the results of the run will be copied to current folder, or the results folder specified in the inputs. For more information on this function, please run:
 help runDynareModel %[output:68d14b73]
 %%
-%[text] For a single job, you can probably submit the job with parfeval. However, note that Dynare runs in the same folder where you have the .MOD file, so if more than one job is submitted, the results might be overwritten. In that case In that case, this would be the best:
-%[text] ```matlabCodeExample
-%[text] c = parcluster('Processes');
-%[text] j = submitDynareJob(c, which("agtrend.mod"), "DynareFlags", ["nolog", "nograph"])
-%[text] ```
-%[text] Then after the job is finished, you can retrieve the diary and the outputs
-%[text] ```matlabCodeExample
-%[text] j.diary
-%[text] out = fetchOutputs(j)
-%[text] ```
-%[text] You can submit as many as those as you want, they will be run simultaneously in the provided pool of workers
 %[text] ### Cluster
-%[text] The same function can help in the the submission of a Dynare job into a cluster, you can run this function as:
+%[text] The same function can help in the the submission of a Dynare job into a cluster, you can run this function in combination with "batch" as follows
 %[text] ```matlabCodeExample
+%[text] ModelFile = 'C:/path/to/agtrend.mod';
+%[text] fcn = @() runDynareModel(ModelFile, Flags = ["nolog", "nowarn"]);
+%[text] 
 %[text] c = parcluster('ClusterName');
-%[text] j = submitDynareJob(c, which("agtrend.mod"), DynareFlags = ["nolog", "nograph"], ...
-%[text]                     DynareLocation = 'C:/Path/To/Dynare', AdditionalFiles = ["file1.mat", "file2.mod"]);
+%[text] j = batch(c, fcn, 1, {}, AttachedFiles = ModelFile, DynareLocation = 'C:/Path/To/Dynare')
 %[text] ```
-%[text] This will submit the job to the appropriate cluster. Note than we need to specify the location of Dynare in the cluster as this is probably different than our own (it might not be even the same OS). 
+%[text] Note that we choose to specify the location of Dynare in the cluster as this is probably different than our own (it might not be even the same OS). 
+%%
+%[text] ### Experiments
+%[text] When you want to run something like a parameter sweep, it can be useful to create an experiment to easily track inputs and outputs. You can even use parallel computing to set your experiment suite and run it in parallel within your own computer or submit it into a cluster. An experienced Dynare user might be able to create an experiment on their own. However, the toolbox has the followint utility function to give you a templated experiment ready to go such that you only need to edit your MOD file into it.
+%[text] ```matlabCodeExample
+%[text] createDynareExperiment("Path/To/New/Folder")
+%[text] ```
+%[text] 
 %%
 %[text] ## Detailed solution
 %[text] ### Issue
