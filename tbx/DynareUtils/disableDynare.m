@@ -1,9 +1,35 @@
 function disableDynare(nvp)
-    % DISABLEDYNARE Function to disable the Dynare addon in MATLAB
-    %
-    % This function checks if Dynare is available and disables it if it is
-    % currently enabled. If Dynare is not available, it provides a message
-    % to the user.
+%DISABLEDYNARE Disable Dynare addon and clear manual installs.
+%
+%   DISABLEDYNARE disables Dynare (if installed and enabled) and clears any
+%   manual Dynare installs from the MATLAB path. If Dynare is not available
+%   the function prints a message.
+%
+%   DISABLEDYNARE(Name,Value) accepts the following name-value pairs:
+%     'Silent'  - logical scalar. If true, suppresses informational
+%                 printed output. Default is false.
+%
+%   The function performs these steps:
+%     1) Calls clear mex to remove compiled MEX files. 2) Checks for the
+%     presence of Dynare on the MATLAB path. 3) If Dynare is not present,
+%     optionally prints a message and returns. 4) If Dynare is present,
+%     queries available and enabled Dynare addons
+%        via dynutil.getDynareAddons().
+%     5) If no enabled addon is found it attempts to clear manual installs.
+%     6) If an enabled addon is present, disables the addon, clears the
+%        install, and verifies that Dynare is no longer on the path.
+%
+%   Notes:
+%     - This function relies on helper utilities in the dynutil package:
+%       dynutil.getDynareAddons, dynutil.clearManualInstall,
+%       dynutil.clearInstall. These functions must be on the MATLAB path.
+%     - The function uses a hard-coded addon identifier for the Dynare
+%       addon. Adjust the identifier if a different addon ID is required.
+%
+%   Example:
+%     disableDynare('Silent',true)
+%
+%   See also clear, which, matlab.addons.disableAddon
 
     arguments
         nvp.Silent (1,1) logical = false
