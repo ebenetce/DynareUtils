@@ -21,9 +21,9 @@ end
 function docTask(~)
 
 if isempty(ver('docmaker'))
-    websave('MATLAB_DocMaker.mltbx','https://github.com/mathworks/docmaker/releases/latest/download/MATLAB_DocMaker.mltbx')
-    matlab.addons.install('MATLAB_DocMaker.mltbx');
-    delete('MATLAB_DocMaker.mltbx');
+    websave('MATLAB_DocMaker.mltbx','https://github.com/mathworks/docmaker/releases/latest/download/MATLAB_DocMaker.mltbx');
+    cobj = onCleanup(@() delete('MATLAB_DocMaker.mltbx'));
+    matlab.addons.install('MATLAB_DocMaker.mltbx', true);
 end
 
 docin = fullfile('tbx', 'doc');
