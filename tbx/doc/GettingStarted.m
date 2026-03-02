@@ -3,11 +3,15 @@
 %[text:tableOfContents]{"heading":"Table of Contents"}
 %[text] ## Dynare version management
 %[text] The toolbox allows setting up Dynare for you, for example, if you run:
-setDynare('6.5')
-%[text] It will download Dynare and install it as a toolbox in MATLAB. You can also use some additional utilities in case you need to swap versions:
-%[text] - **`disableDynare`****\*\*\*\*()**: Disables the current version of Dynare without removing it from the system
+setDynare()
+%[text] It will download the latest version of Dynare and install it as a toolbox in MATLAB. You can optionally specify the version as:
+%[text] ```matlabCodeExample
+%[text] setDynare('5.5')
+%[text] ```
+%[text] There are some additional utilities in case you need to swap versions:
+%[text] - **`disableDynare`****()**: Disables the current version of Dynare without removing it from the system
 %[text] - **`uninstallDynare(<version>)`**: Completely removes the version of Dynare from your computer \
-%[text] Please note that if you install Dynare separately the toolbox attempts to help, but the results can be wrong
+%[text] Please note that if you install Dynare separately the toolbox attempts to help, but the results can be incorrect. It is recommended that either you manually set Dynare, or you entirely manage it via this toolbox, but not both at the same time.
 %%
 %[text] ## Speeding up Dynare estimations with Parallel computing 
 %[text] To make it easier, try first running the model like this (you need to [start a parallel environment ](internal:H_1c5d)first)
@@ -18,7 +22,7 @@ setDynare('6.5')
 %[text] ```matlabCodeExample
 %[text] out = dynareParallel('yourModFile.mod', ...                               % Main mod file, can be in any folder
 %[text]                      Flags = ["nowarn", "nolog"]), ...                    % standard options of the dynare cmmand
-%[text]                      AdditionalFiles = ["steadystate.m", "data.mat"], ... % additional files needed for your model
+%[text]                      AttachedFiles = ["steadystate.m", "data.mat"], ... % additional files needed for your model
 %[text]                      UseParallel = true, ...                              % whether to use parallel or not. 
 %[text]                      GetResultsFolder = false);                           % Whether to collect the folder with markov chain results and other model outputs 
 %[text] 
@@ -75,10 +79,11 @@ help runDynareModel %[output:68d14b73]
 %[text] The same function can help in the the submission of a Dynare job into a cluster, you can run this function in combination with "batch" as follows
 %[text] ```matlabCodeExample
 %[text] ModelFile = 'C:/path/to/agtrend.mod';
-%[text] fcn = @() runDynareModel(ModelFile, Flags = ["nolog", "nowarn"]);
+%[text] DyL = "/opt/dynare/" % For a linux installation
+%[text] fcn = @() runDynareModel(ModelFile, Flags = ["nolog", "nowarn"], DynareLocation = DyL);
 %[text] 
 %[text] c = parcluster('ClusterName');
-%[text] j = batch(c, fcn, 1, {}, AttachedFiles = ModelFile, DynareLocation = 'C:/Path/To/Dynare')
+%[text] j = batch(c, fcn, 1, {}, AttachedFiles = ModelFile)
 %[text] ```
 %[text] Note that we choose to specify the location of Dynare in the cluster as this is probably different than our own (it might not be even the same OS). 
 %%

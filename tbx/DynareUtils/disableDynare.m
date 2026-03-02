@@ -23,7 +23,7 @@ function disableDynare(nvp)
             dynutil.clearManualInstall(); % Clear any manual installations
             return
         end    
-        matlab.addons.disableAddon('dynare', enabled.Version) % Disable the enabled Dynare addon
+        matlab.addons.disableAddon("658a2ffd-f7d5-4170-bcb5-ac75a11196b9", enabled.Version) % Disable the enabled Dynare addon
         dynutil.clearInstall(isDynareAvailable, Silent = true) % Clear paths
         d = which('dynare'); % Check again if Dynare is available
         if isempty(d)

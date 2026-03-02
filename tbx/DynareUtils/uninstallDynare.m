@@ -11,7 +11,7 @@ function uninstallDynare(Version)
     available = dynutil.getDynareAddons(); % Retrieve available Dynare addons
     toRemove = available(available.Version == Version, :); % Filter addons to find the specified version
     if ~isempty(toRemove)
-        matlab.addons.uninstall('dynare', toRemove.Version) % Uninstall the specified version of Dynare
+        matlab.addons.uninstall("658a2ffd-f7d5-4170-bcb5-ac75a11196b9", toRemove.Version) % Uninstall the specified version of Dynare
         fprintf('Uninstalled Dynare %s\n', toRemove.Version) % Confirm uninstallation
     else
         fprintf('Unable to find this version, please see installed versions below:\n\n') % Notify if version not found

@@ -6,7 +6,7 @@ arguments
 end
 
 % Create MLTBX
-opts = matlab.addons.toolbox.ToolboxOptions(location,'dynare', ...
+opts = matlab.addons.toolbox.ToolboxOptions(location,"658a2ffd-f7d5-4170-bcb5-ac75a11196b9", ...
     ToolboxMatlabPath = fullfile(location, 'matlab'));
 
 opts.OutputFile = "dynare.mltbx";

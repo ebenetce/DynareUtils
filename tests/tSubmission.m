@@ -9,11 +9,12 @@ classdef tSubmission < matlab.unittest.TestCase
 
             fprintf('submitting jobs...')
 
-            fcn = @(x) runDynareModel(x, "Flags", ["nolog", "nograph"]);
+            dyn = fileparts(which('dynare.m'));
+            fcn = @(x) runDynareModel(x, "Flags", ["nolog", "nograph"], DynareLocation = dyn);
             j1 = batch(c, fcn, 2, {which("agtrend.mod")} );
 
-            j2 = batch(c, @runDynareModel, {which("fs2000.mod"), "DynareFlags", ["nograph", "nolog"], ...
-                "AttachedFiles", {which("fs2000_nonstationary.mod"), which("fs2000_data.m")}});
+            j2 = batch(c, @runDynareModel, 2, {which("fs2000.mod"), "Flags", ["nograph", "nolog"], ...
+                "AttachedFiles", {which("fs2000_nonstationary.mod"), which("fs2000_data.m")}, "DynareLocation", which('dynare.m')});
 
             cObj1 = onCleanup(@() delete(j1));
             cObj2 = onCleanup(@() delete(j2));

@@ -41,7 +41,7 @@ function setDynare(version, nvp)
         %Enable if already installed
         if isempty(enabled) || enabled.Version ~= version
             disableDynare(Silent = true) % To remove paths.
-            matlab.addons.enableAddon('dynare', version) % Enable the specified version of Dynare
+            matlab.addons.enableAddon("658a2ffd-f7d5-4170-bcb5-ac75a11196b9", version) % Enable the specified version of Dynare
         end
     end
     % Check 

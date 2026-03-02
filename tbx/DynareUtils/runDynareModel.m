@@ -10,9 +10,9 @@ function [out, info] = runDynareModel(name, nvp)
 %   [...] = runDynareModel(NAME, Name,Value) specifies additional options
 %   using name-value pair arguments. Valid name-value pairs are:
 %
-%   'AdditionalFiles'   - (1,:) string, paths to additional files to copy
+%   'AttachedFiles'     - (1,:) string, paths to additional files to copy
 %                         into the run folder (each must exist).
-%   'AdditionalFolders' - (1,:) string, paths to additional folders to copy
+%   'AttachedFolders'   - (1,:) string, paths to additional folders to copy
 %                         into the run folder (each must exist).
 %   'DynareLocation'    - (1,1) string, Location of the dynare.m file. If
 %                         dynare is already on path it can be omitted. Use
@@ -61,8 +61,8 @@ function [out, info] = runDynareModel(name, nvp)
 arguments
     name %(1,1) string {mustBeFile}
     nvp.Flags (1,:) string = string.empty()
-    nvp.AdditionalFiles (1,:) string {mustBeFile} = string.empty()
-    nvp.AdditionalFolders (1,:) string {mustBeFolder} = string.empty()
+    nvp.AttachedFiles (1,:) string {mustBeFile} = string.empty()
+    nvp.AttachedFolders (1,:) string {mustBeFolder} = string.empty()
     nvp.DynareLocation (1,1) string = string(missing)
     nvp.GetResultsFolder (1,1) logical = false
     nvp.Overwrite (1,1) logical = false
@@ -123,13 +123,13 @@ end
 copyfile(fullfile(ModelFolder, ModelName), tdir);
 
 % Move supporting files
-for i = 1 : numel(nvp.AdditionalFiles)
-    copyfile(nvp.AdditionalFiles(i), tdir);
+for i = 1 : numel(nvp.AttachedFiles)
+    copyfile(nvp.AttachedFiles(i), tdir);
 end
 
 % Move supporting folders
-for i = 1 : numel(nvp.AdditionalFolders)
-    copyfile(nvp.AdditionalFolders(i), tdir);
+for i = 1 : numel(nvp.AttachedFolders)
+    copyfile(nvp.AttachedFolders(i), tdir);
 end
 
 % RunDynare
@@ -151,7 +151,7 @@ try
     % We evaluate using "feval" because otherwise some dependency 
     % management would be attempted to move dynare
     info = feval('dynare', char(ModelName) ,  args{:}); %#ok<FVAL>
-    out = collectDynareResults();
+    out = dynutil.collectDynareResults();
     if nvp.GetResultsFolder
         collectModelFolder(ModelNameClean, resultsDir, RunName)
     end
@@ -173,23 +173,6 @@ function cleanup(location, tdir)
     if isfolder(tdir)
         rmdir(tdir, 's')
     end
-end
-
-function out = collectDynareResults()
-
-if isMATLABReleaseOlderThan("R2025a")
-    tname = matlab.lang.internal.uuid;
-    saveCommand = sprintf("save %s.mat", tname);
-    evalin('base', saveCommand);
-    out = load(tname +".mat");
-    try
-        delete(tname + ".mat");
-    catch
-    end
-else
-    out = matlab.lang.Workspace.baseWorkspace;
-end
-
 end
 
 function collectModelFolder(modelName, directory, runName)
