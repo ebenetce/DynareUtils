@@ -8,28 +8,39 @@ setDynare()
 %[text] ```matlabCodeExample
 %[text] setDynare('5.5')
 %[text] ```
+%[text] In Windows, Dynare is packaged as 7z files. To install it with this tool you will need 7z installed. The tool assumes a default location, but you can also specify:
+%[text] ```matlabCodeExample
+%[text] setDynare('5.5', ZipTool = "C:/Path/To/7z.exe")
+%[text] ```
 %[text] There are some additional utilities in case you need to swap versions:
 %[text] - **`disableDynare`****()**: Disables the current version of Dynare without removing it from the system
 %[text] - **`uninstallDynare(<version>)`**: Completely removes the version of Dynare from your computer \
 %[text] Please note that if you install Dynare separately the toolbox attempts to help, but the results can be incorrect. It is recommended that either you manually set Dynare, or you entirely manage it via this toolbox, but not both at the same time.
 %%
 %[text] ## Speeding up Dynare estimations with Parallel computing 
-%[text] To make it easier, try first running the model like this (you need to [start a parallel environment ](internal:H_1c5d)first)
+%[text] This toolbox enables running certain Dynare workflows using parallel computing. Many of them are already enabled in Dynare 7, so please check if that is an option before reading further.
+%[text] For those workflows where parallel computing is indeed possible (see examples below), the goal is to be able to do as follows:
+%[text] %[text:anchor:TMP_5026] **1. Start a parallel environment**
+%[text] ```matlabCodeExample
+%[text] parpool Processes
+%[text] ```
+%[text] **2. Run your model** 
+%[text] The function "**dynareParallel**" will safely run your model using parallel computing toolbox
 %[text] ```matlabCodeExample
 %[text] dynareParallel('yourModFile.mod')
 %[text] ```
-%[text] %[text:anchor:H_5962] This function accepts some additional options:
+%[text] **3. Pass additional options when necessary**
+%[text] %[text:anchor:H_5962] Dynare models can get very complicated, require multiple files and produce a variety of results. This function accepts some additional options to manage those use cases:
 %[text] ```matlabCodeExample
 %[text] out = dynareParallel('yourModFile.mod', ...                               % Main mod file, can be in any folder
-%[text]                      Flags = ["nowarn", "nolog"]), ...                    % standard options of the dynare cmmand
-%[text]                      AttachedFiles = ["steadystate.m", "data.mat"], ... % additional files needed for your model
+%[text]                      Flags = ["nowarn", "nolog"]), ...                    % standard options of the Dynare command
+%[text]                      AttachedFiles = ["steadystate.m", "data.mat"], ...   % additional files needed for your model
 %[text]                      UseParallel = true, ...                              % whether to use parallel or not. 
-%[text]                      GetResultsFolder = false);                           % Whether to collect the folder with markov chain results and other model outputs 
+%[text]                      GetResultsFolder = false);                           % Whether to collect the folder with Markov chain results and other model outputs 
 %[text] 
-%[text] % The out variable is a struct with the workspace after running dynare.
+%[text] % The out variable is a struct with the workspace after running Dynare.
 %[text] ```
-%[text] ### Examples
-%[text] #### Markov Chains in parallel
+%[text] ### Example: Markov Chains in parallel
 %[text] This applies if you are estimating multiple Markov Chains in parallel. This would be a sample estimation:
 %[text] ```matlabCodeExample
 %[text] estimation(order=1, datafile=fs2000_data, loglinear,logdata, mode_compute=4, mh_replic=20000, nodiagnostic,
@@ -42,7 +53,7 @@ setDynare()
 %[text] parpool(c, <NumberOfChains>)
 %[text] out = dynareParallel('yourModel.mod')
 %[text] ```
-%[text] #### Estimation using Parallel computing 
+%[text] ### Example: Posterior Mode Optimization using Parallel computing 
 %[text] %[text:anchor:TMP_46da] This applies if you have an estimation block in your model file with the following block:
 %[text] ```
 %[text] estimation(optim=('UseParallel', true), datafile=usmodel_data,
@@ -59,7 +70,7 @@ setDynare()
 %[text] There are multiple ways to submit Dynare jobs and it greatly depends on whether you do it locally or in a cluster. 
 %[text] **Note:** If you want to run Dynare in parallel using Jobs, please consider using Dynare 7 or newer
 %[text] ### Local machine
-%[text] The easiest way to run a dynare job is to use parfeval, this will directly submit the Dynare calculations to a local worker in your machine. However, it is highly encouraged that you submit jobs using the built-in wrapper. Otherwise, simultaneous dynare jobs might override the results. This function has the additional advantage that does not require the MOD file to exist in the same folder where you are launching the job.
+%[text] The easiest way to run a Dynare job is to use parfeval, this will directly submit the Dynare calculations to a local worker in your machine. However, it is highly encouraged that you submit jobs using the built-in wrapper. Otherwise, simultaneous dynare jobs might override the results. This function has the additional advantage that does not require the MOD file to exist in the same folder where you are launching the job.
 %[text] ```matlabCodeExample
 %[text] fcn = j = parfeval( @(x) runDynareModel(x, Flags = ["nolog", "nowarn"], CollectResultsFolder = false) )
 %[text] j = parfeval(fcn, 2, "C:\Path\To\yourmodel.mod" )
@@ -72,7 +83,7 @@ setDynare()
 %[text] ```matlabCodeExample
 %[text] out = fetchOutputs(j)
 %[text] ```
-%[text] If you have selected "**`CollectResultsFolder = true`**" the folder with the results of the run will be copied to current folder, or the results folder specified in the inputs. For more information on this function, please run:
+%[text] If you have selected "**`GetResultsFolder = true`**" the folder with the results of the run will be copied to current folder, or the results folder specified in the inputs. For more information on this function, please run:
 help runDynareModel %[output:68d14b73]
 %%
 %[text] ### Cluster
@@ -88,7 +99,7 @@ help runDynareModel %[output:68d14b73]
 %[text] Note that we choose to specify the location of Dynare in the cluster as this is probably different than our own (it might not be even the same OS). 
 %%
 %[text] ### Experiments
-%[text] When you want to run something like a parameter sweep, it can be useful to create an experiment to easily track inputs and outputs. You can even use parallel computing to set your experiment suite and run it in parallel within your own computer or submit it into a cluster. An experienced Dynare user might be able to create an experiment on their own. However, the toolbox has the followint utility function to give you a templated experiment ready to go such that you only need to edit your MOD file into it.
+%[text] When you want to run something like a parameter sweep, it can be useful to create an experiment to easily track inputs and outputs. You can even use parallel computing to set your experiment suite and run it in parallel within your own computer or submit it into a cluster. An experienced Dynare user might be able to create an experiment on their own. However, the toolbox has the following utility function to give you a template experiment ready to go such that you only need to edit your MOD file into it.
 %[text] ```matlabCodeExample
 %[text] createDynareExperiment(pwd)
 %[text] ```

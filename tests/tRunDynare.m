@@ -26,7 +26,7 @@ classdef tRunDynare < matlab.unittest.TestCase
         % Test methods
         function tBasicTest(testCase)
             out = dynareParallel(which('agtrend.mod'), Flags = ["nowarn", "nolog", "nograph"]);
-            testCase.verifyClass(out, 'struct')
+            testCase.verifyClass(out, 'matlab.lang.Workspace')
         end
 
         
@@ -34,7 +34,7 @@ classdef tRunDynare < matlab.unittest.TestCase
         function tSerialFs2000(testCase)           
 
             out = dynareParallel(which('fs2000.mod'), AdditionalFiles = which("fs2000_data.m"), Flags = ["nograph", "nolog"]);
-            testCase.verifyClass(out, 'struct')
+            testCase.verifyClass(out, 'matlab.lang.Workspace')
 
             out2 = dynareParallel(which('fs2000.mod'), AdditionalFiles = which("fs2000_data.m"), Flags = ["nograph", "nolog"], UseParallel = false);
 
