@@ -2,3 +2,5 @@
 derived/
 tests/release/
 releases/
+tests/coverage.html
+tests/report.html
