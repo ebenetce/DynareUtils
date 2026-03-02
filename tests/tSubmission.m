@@ -8,9 +8,13 @@ classdef tSubmission < matlab.unittest.TestCase
             c.NumThreads = 2;
 
             fprintf('submitting jobs...')
-            j1 = submitDynareJob(c, which("agtrend.mod"), "DynareFlags", ["nolog", "nograph"]);
-            j2 = submitDynareJob(c, which("fs2000.mod"), "DynareFlags", ["nograph", "nolog"], ...
-                AttachedFiles = {which("fs2000_nonstationary.mod"), which("fs2000_data.m")});
+
+            fcn = @(x) runDynareModel(x, "Flags", ["nolog", "nograph"]);
+            j1 = batch(c, fcn, 2, {which("agtrend.mod")} );
+
+            j2 = batch(c, @runDynareModel, {which("fs2000.mod"), "DynareFlags", ["nograph", "nolog"], ...
+                "AttachedFiles", {which("fs2000_nonstationary.mod"), which("fs2000_data.m")}});
+            
             cObj1 = onCleanup(@() delete(j1));
             cObj2 = onCleanup(@() delete(j2));
             wait(j1)

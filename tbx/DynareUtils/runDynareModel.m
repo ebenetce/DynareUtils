@@ -10,31 +10,31 @@ function [out, info] = runDynareModel(name, nvp)
 %   [...] = runDynareModel(NAME, Name,Value) specifies additional options
 %   using name-value pair arguments. Valid name-value pairs are:
 %
-%   'Flags'             - (1,:) string, Dynare command-line flags passed
-%                         to dynare (default: string.empty()).
 %   'AdditionalFiles'   - (1,:) string, paths to additional files to copy
 %                         into the run folder (each must exist).
 %   'AdditionalFolders' - (1,:) string, paths to additional folders to copy
 %                         into the run folder (each must exist).
-%   'RunFolder'         - (1,1) string, base folder in which to create the
-%                         run folder (default: tempdir).
-%   'GetResultsFolder'  - (1,1) logical, when true the entire model
-%                         folder produced by Dynare is moved back to the
-%                         calling directory under the run name (default: false).
-%   'RunName'           - (1,1) string, explicit name for the run folder.
-%                         If not provided, a timestamped name will be used.
-%   'Overwrite'         - (1,1) logical, if true an existing run with the 
-%                         same name will be removed (default: false).
-%   'WorkingDir'        - (1,1) string, working folder to return to on
-%                         completion. This must be an existing folder
-%                         (default: pwd).
-%   'ResultsDir'        - (1,1) string, folder to copy the results from the
-%                         run (default: WorkingDir)
 %   'DynareLocation'    - (1,1) string, Location of the dynare.m file. If
 %                         dynare is already on path it can be omitted. Use
 %                         this if you are running on a cluster with a
 %                         different location for Dynare, or if you want to
 %                         override your default installation.
+%   'Flags'             - (1,:) string, Dynare command-line flags passed
+%                         to dynare (default: string.empty()).
+%   'GetResultsFolder'  - (1,1) logical, when true the entire model
+%                         folder produced by Dynare is moved back to the
+%                         calling directory under the run name (default: false).
+%   'Overwrite'         - (1,1) logical, if true an existing run with the 
+%                         same name will be removed (default: false).
+%   'ResultsDir'        - (1,1) string, folder to copy the results from the
+%                         run (default: WorkingDir)
+%   'RunFolder'         - (1,1) string, base folder in which to create the
+%                         run folder (default: tempdir).
+%   'RunName'           - (1,1) string, explicit name for the run folder.
+%                         If not provided, a timestamped name will be used.
+%   'WorkingDir'        - (1,1) string, working folder to return to on
+%                         completion. This must be an existing folder
+%                         (default: pwd).
 %
 %   Example:
 %       [out, info] = runDynareModel("myModel.mod", 'RunFolder', tempdir, ...
@@ -63,13 +63,13 @@ arguments
     nvp.Flags (1,:) string = string.empty()
     nvp.AdditionalFiles (1,:) string {mustBeFile} = string.empty()
     nvp.AdditionalFolders (1,:) string {mustBeFolder} = string.empty()
-    nvp.RunFolder (1,1) string = tempdir
-    nvp.GetResultsFolder (1,1) logical = false
-    nvp.RunName (1,1) string = string(missing)
-    nvp.Overwrite (1,1) logical = false
-    nvp.WorkingDir (1,1) string {mustBeFolder} = pwd
-    nvp.ResultsDir (1,1) string = string(missing)
     nvp.DynareLocation (1,1) string = string(missing)
+    nvp.GetResultsFolder (1,1) logical = false
+    nvp.Overwrite (1,1) logical = false
+    nvp.ResultsDir (1,1) string = string(missing)
+    nvp.RunFolder (1,1) string = tempdir
+    nvp.RunName (1,1) string = string(missing)
+    nvp.WorkingDir (1,1) string {mustBeFolder} = pwd
 end
 
 % Process filename
