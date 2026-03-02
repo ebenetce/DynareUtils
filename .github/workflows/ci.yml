@@ -1,8 +1,11 @@
+env:
+  DOCMAKER_GITHUB_TOKEN: ${{ secrets.DOCMAKER_GITHUB_TOKEN }}
+
 name: Build Toolbox
 on: [push]
 jobs:
   build-dynare-utils:
-    name: Run MATLAB Script
+    name: Package Toolbox
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
