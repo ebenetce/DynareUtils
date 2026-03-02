@@ -1,2 +1,2 @@
-function out = DynareUtilsRoot()
-out = fileparts(mfilename('fullpath'));
+function out = dynareUtilsRoot()
+out = fileparts(fileparts(mfilename('fullpath')));

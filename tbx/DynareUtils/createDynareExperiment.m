@@ -31,14 +31,16 @@ end
 
 destination = fullfile(folder, name);
 if isfolder(destination)
+    destination_new = destination;
     count = 1;
-    while isfolder(destination)
-        destination = destination + "_" + count;
+    while isfolder(destination_new)
+        destination_new = destination + "_" + count;
         count = count + 1; % Increment the count for the new folder name
     end
+    destination = destination_new;
 end
 
 mkdir(destination)
 
-matlab.project.extractProject(fullfile(dynareUtilsRoot, 'tbx','experiment','DynareExperiment.mlproj'), folder);
-experiments.internal.View('project',fullfile(folder, 'DynareExperiment.prj'));
+matlab.project.extractProject(fullfile(dynareUtilsRoot, 'experiment','DynareExperiment.mlproj'), destination);
+experiments.internal.View('project',fullfile(destination, 'DynareExperiment.prj'));

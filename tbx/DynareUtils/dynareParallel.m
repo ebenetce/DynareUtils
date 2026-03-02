@@ -78,7 +78,7 @@ if nvp.UseParallel
     end
 
     % Copy files
-    copyfile(fullfile(dynareUtilsRoot, dynver, '*'), folder)
+    copyfile(fullfile(dynareUtilsRoot, 'DynareUtils', dynver, '*'), folder)
 
 end
 

@@ -85,7 +85,7 @@ help runDynareModel %[output:68d14b73]
 %[text] ### Experiments
 %[text] When you want to run something like a parameter sweep, it can be useful to create an experiment to easily track inputs and outputs. You can even use parallel computing to set your experiment suite and run it in parallel within your own computer or submit it into a cluster. An experienced Dynare user might be able to create an experiment on their own. However, the toolbox has the followint utility function to give you a templated experiment ready to go such that you only need to edit your MOD file into it.
 %[text] ```matlabCodeExample
-%[text] createDynareExperiment("Path/To/New/Folder")
+%[text] createDynareExperiment(pwd)
 %[text] ```
 %[text] 
 %%
