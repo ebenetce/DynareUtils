@@ -23,6 +23,13 @@ arguments
     nvp.GetResultsFolder (1,1) logical = false          % Whether to bring the results folder
 end
 
+dynver = extractBefore(dynare_version, '.');
+if dynver == '4'
+    error('DynareUtils:NotSupportedFor4', 'This is not supported on Dynare 4.X and older versions')
+elseif dynver == '7'
+    warning('DynareUtils:BuiltInSupport', 'Dynare 7 supports parallel processing out of the box, please consider using "dynare" directly')
+end
+
 % Dynare dumps results in base workspace. clear it
 evalin('base', 'clear');
 
@@ -71,7 +78,6 @@ if nvp.UseParallel
     end
 
     % Copy files
-    dynver = extractBefore(dynare_version,'.');
     copyfile(fullfile(dynareUtilsRoot, dynver, '*'), folder)
 
 end
