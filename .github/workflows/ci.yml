@@ -1,8 +1,13 @@
 env:
   DOCMAKER_GITHUB_TOKEN: ${{ secrets.DOCMAKER_GITHUB_TOKEN }}
 
-name: Build Toolbox
+name: Build and Test Toolbox
+
 on: [push]
+
+permissions:
+  contents: write
+
 jobs:
   package-dynare-utils:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -32,7 +37,7 @@ jobs:
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
         with:
-          prodcuts: MATLAB
+          products: MATLAB
           release: R2025b
 
       - name: Package toolbox
@@ -49,5 +54,3 @@ jobs:
           draft: false
           make_latest: true
           files: releases/DynareUtils.mltbx
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
