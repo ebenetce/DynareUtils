@@ -72,6 +72,7 @@ opts.SupportedPlatforms.Glnxa64 = false;
 opts.SupportedPlatforms.Win64 = true;
 opts.SupportedPlatforms.Maci64 = false;
 opts.SupportedPlatforms.MatlabOnline = false;
+opts.ToolboxMatlabPath = [fullfile(dynareUtilsRoot, "DynareUtils"); fullfile(dynareUtilsRoot,"dynareutilsdoc") ] ;
 
 % Exclude MD files:
 opts.ToolboxFiles(endsWith(opts.ToolboxFiles, ".md")) = [];

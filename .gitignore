@@ -8,3 +8,8 @@ tbx/docmakerdoc
 tests/release/
 tests/coverage.html
 tests/report.html
+
+tbx/dynareutilsdoc/*.html
+tbx/dynareutilsdoc/*.xml
+tbx/dynareutilsdoc/helpsearch-v4_en/
+tbx/dynareutilsdoc/resources
