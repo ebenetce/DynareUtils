@@ -63,7 +63,7 @@ if isempty(isVersionAvailable)
         % Install if not available
         dynutil.downloadAndInstall(version, ZipTool = nvp.ZipTool) % Download and install the specified version
     catch e
-        error('Error downloading Dynare. Please check the <a href="matlab:dynutil.getAllDynareVersions">available dynare versions</a>\n\nThe actual error was %s\n', e.message);
+        error('Error downloading Dynare. Please check the <a href="matlab:dynutil.getAllDynareVersions">available dynare versions</a>\n\nThe actual error was:\n\n %s\n', e.message);
     end
 else
     %Enable if already installed

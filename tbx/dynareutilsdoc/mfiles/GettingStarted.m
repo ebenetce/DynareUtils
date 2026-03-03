@@ -18,7 +18,14 @@ setDynare()
 %[text] Please note that if you install Dynare separately the toolbox attempts to help, but the results can be incorrect. It is recommended that either you manually set Dynare, or you entirely manage it via this toolbox, but not both at the same time.
 %%
 %[text] ## Speeding up Dynare estimations with Parallel computing 
-%[text] This toolbox enables running certain Dynare workflows using parallel computing. Many of them are already enabled in Dynare 7, so please check if that is an option before reading further.
+%[text] ### Requirements
+%[text] - MATLAB
+%[text] - Dynare 5 - 6
+%[text] - Parallel Computing toolbox \
+%%
+%[text] ### Quick start
+%[text] This toolbox enables running certain Dynare workflows using parallel computing. 
+%[text] **Note: Dynare 7 contains native parallelization for many workflows. Use** **`dynareParallel`** **only when native Dynare parallelism does not apply.**
 %[text] For those workflows where parallel computing is indeed possible (see examples below), the goal is to be able to do as follows:
 %[text] %[text:anchor:TMP_5026] **1. Start a parallel environment**
 %[text] ```matlabCodeExample
@@ -27,30 +34,38 @@ setDynare()
 %[text] **2. Run your model** 
 %[text] The function "**dynareParallel**" will safely run your model using parallel computing toolbox
 %[text] ```matlabCodeExample
-%[text] dynareParallel('yourModFile.mod')
+%[text] out = dynareParallel('yourModFile.mod')
 %[text] ```
+%[text] This function will:
+%[text] - Run the Dynare call in a sandboxed temporary directory
+%[text] - Isolation of outputs to avoid collisions
+%[text] - Copying dependencies (`AttachedFiles` / `AttachedFolders`)
+%[text] - Returning the base workspace as a **`struct`** in `out` \
+%%
 %[text] **3. Pass additional options when necessary**
 %[text] %[text:anchor:H_5962] Dynare models can get very complicated, require multiple files and produce a variety of results. This function accepts some additional options to manage those use cases:
 %[text] ```matlabCodeExample
 %[text] out = dynareParallel('yourModFile.mod', ...                               % Main mod file, can be in any folder
 %[text]                      Flags = ["nowarn", "nolog"]), ...                    % standard options of the Dynare command
 %[text]                      AttachedFiles = ["steadystate.m", "data.mat"], ...   % additional files needed for your model
-%[text]                      UseParallel = true, ...                              % whether to use parallel or not. 
+%[text]                      UseParallel = true, ...                              % whether to use parallel computing or not. 
 %[text]                      GetResultsFolder = false);                           % Whether to collect the folder with Markov chain results and other model outputs 
 %[text] 
 %[text] % The out variable is a struct with the workspace after running Dynare.
 %[text] ```
+%%
 %[text] ### Example: Markov Chains in parallel
 %[text] This applies if you are estimating multiple Markov Chains in parallel. This would be a sample estimation:
 %[text] ```matlabCodeExample
 %[text] estimation(order=1, datafile=fs2000_data, loglinear,logdata, mode_compute=4, mh_replic=20000, nodiagnostic,
 %[text] mh_nblocks=2, mh_jscale=0.8, mode_check);
 %[text] ```
-%[text] In this case 2 chains are estimated, so you probably want to create a parpool of this type:
+%[text] In this case 2 chains are estimated, so you probably want to create a parpool where the number of workers matches the number of mh\_blocks:
 %[text] ```matlabCodeExample
 %[text] c = parcluster('Processes');
-%[text] c.NumThreads = <NumberOfCores>/<NumberOfChains>;
+%[text] c.NumThreads = floor(<NumberOfCores>/<NumberOfChains>);
 %[text] parpool(c, <NumberOfChains>)
+%[text] 
 %[text] out = dynareParallel('yourModel.mod')
 %[text] ```
 %[text] ### Example: Posterior Mode Optimization using Parallel computing 
@@ -60,7 +75,7 @@ setDynare()
 %[text] mode_compute=1,first_obs=1, presample=4,lik_init=2,prefilter=0,
 %[text] mh_replic=0,mh_nblocks=2,mh_jscale=0.20,mh_drop=0.2, nograph, nodiagnostic, tex);
 %[text] ```
-%[text] **`mode_compute = 1`** establishes that you are using "**`fmincon`**". This is a built-in algorithm and it accepts a parallel flag to speed up the process. To enable this, you need to run it as follows:
+%[text] **`mode_compute = 1`** establishes that you are using "**`fmincon`**". This is a built-in algorithm that uses **finite difference gradients**, which are expensive and benefit from parallelism. Hence, it accepts a parallel flag to speed up the process. To enable this, you need to run it as follows:
 %[text] ```matlabCodeExample
 %[text] parpool('Processes')
 %[text] out = dynareParallel('model_file.mod')
@@ -70,10 +85,11 @@ setDynare()
 %[text] There are multiple ways to submit Dynare jobs and it greatly depends on whether you do it locally or in a cluster. 
 %[text] **Note:** If you want to run Dynare in parallel using Jobs, please consider using Dynare 7 or newer
 %[text] ### Local machine
-%[text] The easiest way to run a Dynare job is to use parfeval, this will directly submit the Dynare calculations to a local worker in your machine. However, it is highly encouraged that you submit jobs using the built-in wrapper. Otherwise, simultaneous dynare jobs might override the results. This function has the additional advantage that does not require the MOD file to exist in the same folder where you are launching the job.
+%[text] The easiest way to run a Dynare job is to use parfeval, this will directly submit the Dynare calculations to a local worker in your machine. However, it is highly encouraged that you submit jobs using the built-in wrapper. Otherwise, simultaneous Dynare jobs might override the results. This function has the additional advantage that does not require the MOD file to exist in the same folder where you are launching the job.
 %[text] ```matlabCodeExample
-%[text] fcn = j = parfeval( @(x) runDynareModel(x, Flags = ["nolog", "nowarn"], CollectResultsFolder = false) )
-%[text] j = parfeval(fcn, 2, "C:\Path\To\yourmodel.mod" )
+%[text] parpool('Processes',1)
+%[text] fcn = @(x) runDynareModel(x, Flags = ["nolog", "nowarn"], GetResultsFolder = false)
+%[text] j = parfeval(fcn, 2, fullfile("Path","To","yourmodel.mod") )
 %[text] ```
 %[text] Once the job is done, you can then see the Diary
 %[text] ```matlabCodeExample
@@ -81,8 +97,10 @@ setDynare()
 %[text] ```
 %[text] Or collect the outputs:
 %[text] ```matlabCodeExample
-%[text] out = fetchOutputs(j)
+%[text] [out, info] = fetchOutputs(j)
 %[text] ```
+%[text] - `out` contains the base workspace state after Dynare runs.
+%[text] - `info` contains Dynare's internal return structure. \
 %[text] If you have selected "**`GetResultsFolder = true`**" the folder with the results of the run will be copied to current folder, or the results folder specified in the inputs. For more information on this function, please run:
 help runDynareModel %[output:68d14b73]
 %%
@@ -103,11 +121,12 @@ help runDynareModel %[output:68d14b73]
 %[text] ```matlabCodeExample
 %[text] createDynareExperiment(pwd)
 %[text] ```
-%[text] 
+%[text] `createDynareExperiment` produces a standard experiment harness including scripts for parameter sweeps, metadata tracking, and (optionally) batch submission.
 %%
 %[text] ## Detailed solution
 %[text] ### Issue
-%[text] The problem is the use of persistent variables. The code relies on having to initialize certain functions. This is local to the MATLAB session and is not taken into account in the parallel workers.
+%[text] Dynare 5.x and 6.x uses persistent variables in some internal functions. These persist only within the MATLAB client session not on parallel workers creating inconsistent results in parallel mode.
+%[text] The code relies on having to initialize certain functions. This is local to the MATLAB session and is not taken into account in the parallel workers.
 %[text] If we look at the execution profile below, fmincon calls a function called "**`priordens`**" (marked in red) and a second one "**`dyn_first_order_solver`**" that heavily use persistent variables to be more efficient. 
 %[text] ```matlabCodeExample
 %[text] function [logged_prior_density, dlprior, d2lprior, info] = priordens(x, pshape, p6, p7, p3, p4, initialization)
@@ -129,6 +148,7 @@ dynareUtilsRoot
 %[text] - posterior\_sampler\_core.m
 %[text] - set\_dynare\_seed.m
 %[text] - set\_prior.m \
+%[text] This works because the new functions will take precedence over the internal ones in Dynare.
 %[text] %[text:anchor:H_1c5d] **2. Start a parallel environment**
 %[text] For a local run, you can do this:
 %[text] ```matlabCodeExample
@@ -158,5 +178,5 @@ dynareUtilsRoot
 %   data: {"layout":"inline","rightPanelPercent":40}
 %---
 %[output:68d14b73]
-%   data: {"dataType":"text","outputData":{"text":" <strong>runDynareModel<\/strong> Run a Dynare model in an isolated temporary folder.\n \n    [OUT, INFO] = <strong>runDynareModel<\/strong>(NAME) copies the Dynare model file specified\n    by NAME (a string filename or full path) into a running folder, runs\n    Dynare on that model, collects results into OUT, and returns the INFO\n    output from Dynare. By default a timestamped run folder is created in\n    the system temporary directory.\n \n    [...] = <strong>runDynareModel<\/strong>(NAME, Name,Value) specifies additional options\n    using name-value pair arguments. Valid name-value pairs are:\n \n    'Flags'             - (1,:) string, Dynare command-line flags passed\n                          to dynare (default: string.empty()).\n    'AdditionalFiles'   - (1,:) string, paths to additional files to copy\n                          into the run folder (each must exist).\n    'AdditionalFolders' - (1,:) string, paths to additional folders to copy\n                          into the run folder (each must exist).\n    'RunFolder'         - (1,1) string, base folder in which to create the\n                          run folder (default: tempdir).\n    'GetResultsFolder'  - (1,1) logical, when true the entire model\n                          folder produced by Dynare is moved back to the\n                          calling directory under the run name (default: false).\n    'RunName'           - (1,1) string, explicit name for the run folder.\n                          If not provided, a timestamped name will be used.\n    'Overwrite'         - (1,1) logical, if true an existing run with the \n                          same name will be removed (default: false).\n    'WorkingDir'        - (1,1) string, working folder to return to on\n                          completion. This must be an existing folder\n                          (default: pwd).\n    'ResultsDir'        - (1,1) string, folder to copy the results from the\n                          run (default: WorkingDir)\n    'DynareLocation'    - (1,1) string, Location of the dynare.m file. If\n                          dynare is already on path it can be omitted. Use\n                          this if you are running on a cluster with a\n                          different location for Dynare, or if you want to\n                          override your default installation.\n \n    Example:\n        [out, info] = <strong>runDynareModel<\/strong>(\"myModel.mod\", 'RunFolder', tempdir, ...\n            'Flags', \"nolog\", 'GetResultsFolder', true);\n \n    Outputs:\n        OUT  - structure containing workspace variables from the base\n               workspace after Dynare execution (or saved results).\n        INFO - the output returned by dynare(...) call.\n \n    Notes:\n      - NAME must refer to an existing file. Use full path or relative path.\n      - The function creates a temporary run folder and removes it on\n        function completion (unless GetResultsFolder is true, in which\n        case the Dynare-generated model folder is moved back to the caller\n        location under the run name).\n      - The function attempts to return workspace variables from the base\n        workspace; on older MATLAB releases it uses a temporary save\/load.\n \n    See also <a href=\"matlab:help dynare -displayBanner\">dynare<\/a>, <a href=\"matlab:help tempdir -displayBanner\">tempdir<\/a>, <a href=\"matlab:help copyfile -displayBanner\">copyfile<\/a>, <a href=\"matlab:help movefile -displayBanner\">movefile<\/a>, <a href=\"matlab:help rmdir -displayBanner\">rmdir<\/a>.\n \n    Copyright 2024 - 2026 The MathWorks, Inc.\n\n","truncated":false}}
+%   data: {"dataType":"text","outputData":{"text":" <strong>runDynareModel<\/strong> Run a Dynare model in an isolated temporary folder.\n \n    [OUT, INFO] = <strong>runDynareModel<\/strong>(NAME) copies the Dynare model file specified\n    by NAME (a string filename or full path) into a running folder, runs\n    Dynare on that model, collects results into OUT, and returns the INFO\n    output from Dynare. By default a timestamped run folder is created in\n    the system temporary directory.\n \n    [...] = <strong>runDynareModel<\/strong>(NAME, Name,Value) specifies additional options\n    using name-value pair arguments. Valid name-value pairs are:\n \n    'AttachedFiles'     - (1,:) string, paths to additional files to copy\n                          into the run folder (each must exist).\n    'AttachedFolders'   - (1,:) string, paths to additional folders to copy\n                          into the run folder (each must exist).\n    'DynareLocation'    - (1,1) string, Location of the dynare.m file. If\n                          dynare is already on path it can be omitted. Use\n                          this if you are running on a cluster with a\n                          different location for Dynare, or if you want to\n                          override your default installation.\n    'Flags'             - (1,:) string, Dynare command-line flags passed\n                          to dynare (default: string.empty()).\n    'GetResultsFolder'  - (1,1) logical, when true the entire model\n                          folder produced by Dynare is moved back to the\n                          calling directory under the run name (default: false).\n    'Overwrite'         - (1,1) logical, if true an existing run with the \n                          same name will be removed (default: false).\n    'ResultsDir'        - (1,1) string, folder to copy the results from the\n                          run (default: WorkingDir)\n    'RunFolder'         - (1,1) string, base folder in which to create the\n                          run folder (default: tempdir).\n    'RunName'           - (1,1) string, explicit name for the run folder.\n                          If not provided, a timestamped name will be used.\n    'WorkingDir'        - (1,1) string, working folder to return to on\n                          completion. This must be an existing folder\n                          (default: pwd).\n \n    Example:\n        [out, info] = <strong>runDynareModel<\/strong>(\"myModel.mod\", 'RunFolder', tempdir, ...\n            'Flags', \"nolog\", 'GetResultsFolder', true);\n \n    Outputs:\n        OUT  - structure containing workspace variables from the base\n               workspace after Dynare execution (or saved results).\n        INFO - the output returned by dynare(...) call.\n \n    Notes:\n      - NAME must refer to an existing file. Use full path or relative path.\n      - The function creates a temporary run folder and removes it on\n        function completion (unless GetResultsFolder is true, in which\n        case the Dynare-generated model folder is moved back to the caller\n        location under the run name).\n      - The function attempts to return workspace variables from the base\n        workspace; on older MATLAB releases it uses a temporary save\/load.\n \n    See also dynare, <a href=\"matlab:help tempdir -displayBanner\">tempdir<\/a>, <a href=\"matlab:help copyfile -displayBanner\">copyfile<\/a>, <a href=\"matlab:help movefile -displayBanner\">movefile<\/a>, <a href=\"matlab:help rmdir -displayBanner\">rmdir<\/a>.\n \n    Copyright 2024 - 2026 The MathWorks, Inc.\n\n","truncated":false}}
 %---

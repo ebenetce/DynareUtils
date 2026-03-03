@@ -26,11 +26,6 @@ doc = fullfile( dynareUtilsRoot, "dynareutilsdoc" );
 
 export(fullfile(doc, 'mfiles', 'GettingStarted.m'), fullfile(doc, 'index.md'));
 
-% files =  dir(fullfile( dynareUtilsRoot, "DynareUtils", "*.m" ));
-% for i = 1 : numel(files)
-%     export( fullfile(files(i).folder, files(i).name), fullfile(dynareUtilsRoot, 'doc', strrep(files(i).name, '.m', '.md')) )
-% end
-
 end
 
 function docTask(~)
