@@ -14,8 +14,23 @@ plan("test") = TestTask(SourceFiles = "tbx", TestResults = "tests/report.html", 
 % Make the "archive" task the default task in the plan
 plan.DefaultTasks = "archive";
 
+plan("doc").Dependencies = "exportmd";
+
 % Make the "archive" task dependent on the "check" and "test" tasks
 plan("archive").Dependencies = ["check" "test", "doc"];
+end
+
+function exportmdTask(~)
+
+doc = fullfile( dynareUtilsRoot, "dynareutilsdoc" );
+
+export(fullfile(doc, 'mfiles', 'GettingStarted.m'), fullfile(doc, 'index.md'));
+
+% files =  dir(fullfile( dynareUtilsRoot, "DynareUtils", "*.m" ));
+% for i = 1 : numel(files)
+%     export( fullfile(files(i).folder, files(i).name), fullfile(dynareUtilsRoot, 'doc', strrep(files(i).name, '.m', '.md')) )
+% end
+
 end
 
 function docTask(~)
@@ -26,27 +41,16 @@ if isempty(ver('docmaker'))
     matlab.addons.install('MATLAB_DocMaker.mltbx', true);
 end
 
-doc = fullfile('tbx', 'doc');
-if ~isfolder(doc)
-    mkdir(doc) % make destination folder
-end
+doc = fullfile( dynareUtilsRoot, "dynareutilsdoc" );
 
 docdelete(doc)
 
-export(fullfile(doc, 'GettingStarted.m'), fullfile(doc, 'GettingStarted.md'));
-
 md = fullfile(doc,"**","*.md"); % Markdown documents
 
-[html,res] = docconvert(md); % convert to HTML
+html = docconvert(md); % convert to HTML
 
 docrun(html) % run code and insert output
-[xml,db] = docindex(doc); % index
-
-
-arrayfun(@movefile,html,fullfile(doc,extractAfter(html,doc))) % move HTML documents
-movefile(res,fullfile(doc,extractAfter(res,doc))) % move resources folder
-arrayfun(@movefile,xml,fullfile(doc,extractAfter(xml,doc))) % move index files
-movefile(db,fullfile(doc,extractAfter(db,doc))) % move search database folder
+docindex(doc); % index
 
 end 
 
@@ -61,14 +65,20 @@ opts.AuthorName = "Edu Benet Cerda";
 opts.Description = "Several utilities to complement running and managing Dynare models such as Parallel Computing and Version management";
 opts.OutputFile = "releases/DynareUtils.mltbx";
 opts.Summary = "Dynare utils";
-opts.ToolboxGettingStartedGuide = fullfile(here, 'tbx', 'doc', 'GettingStarted.m');
-opts.ToolboxVersion = '0.2.0';
+opts.ToolboxGettingStartedGuide = fullfile(here, 'tbx', 'dynareutilsdoc', 'mfiles', 'GettingStarted.m');
+opts.ToolboxVersion = ver('DynareUtils').Version;
 opts.ToolboxName = "DynareUtils";
 opts.SupportedPlatforms.Glnxa64 = false;
 opts.SupportedPlatforms.Win64 = true;
 opts.SupportedPlatforms.Maci64 = false;
 opts.SupportedPlatforms.MatlabOnline = false;
-opts.ToolboxMatlabPath = fullfile(here, 'tbx','DynareUtils');
-          
+
+% Exclude MD files:
+opts.ToolboxFiles(endsWith(opts.ToolboxFiles, ".md")) = [];
+
 matlab.addons.toolbox.packageToolbox(opts)
+
+% Add license
+lic = fileread( "License.txt" );
+mlAddonSetLicense( char( opts.OutputFile ), struct( "type", 'BSD', "text", lic ) );
 end
