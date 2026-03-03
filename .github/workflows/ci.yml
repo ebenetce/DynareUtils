@@ -18,3 +18,13 @@ jobs:
         uses: matlab-actions/run-build@v2
         with:
           build-options: -skip test
+      - name: Upload toolbox artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dynare-utils-mltbx
+          # Adjust the path if your build writes somewhere else
+          path: |
+            releases/*.mltbx
+            artifacts/*.mltbx
+          retention-days: 14
+          overwrite: true

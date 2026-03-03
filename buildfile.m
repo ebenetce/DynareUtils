@@ -26,28 +26,27 @@ if isempty(ver('docmaker'))
     matlab.addons.install('MATLAB_DocMaker.mltbx', true);
 end
 
-docin = fullfile('tbx', 'doc');
-docout = fullfile('tbx', 'docmakerdoc');
-if ~isfolder(docout)
-    mkdir(docout) % make destination folder
+doc = fullfile('tbx', 'doc');
+if ~isfolder(doc)
+    mkdir(doc) % make destination folder
 end
 
-docdelete(docout)
+docdelete(doc)
 
-export(fullfile(docin, 'GettingStarted.m'), fullfile(docin, 'GettingStarted.md'));
+export(fullfile(doc, 'GettingStarted.m'), fullfile(doc, 'GettingStarted.md'));
 
-md = fullfile(docin,"**","*.md"); % Markdown documents
+md = fullfile(doc,"**","*.md"); % Markdown documents
 
 [html,res] = docconvert(md); % convert to HTML
 
 docrun(html) % run code and insert output
-[xml,db] = docindex(docin); % index
+[xml,db] = docindex(doc); % index
 
 
-arrayfun(@movefile,html,fullfile(docout,extractAfter(html,docin))) % move HTML documents
-movefile(res,fullfile(docout,extractAfter(res,docin))) % move resources folder
-arrayfun(@movefile,xml,fullfile(docout,extractAfter(xml,docin))) % move index files
-movefile(db,fullfile(docout,extractAfter(db,docin))) % move search database folder
+arrayfun(@movefile,html,fullfile(doc,extractAfter(html,doc))) % move HTML documents
+movefile(res,fullfile(doc,extractAfter(res,doc))) % move resources folder
+arrayfun(@movefile,xml,fullfile(doc,extractAfter(xml,doc))) % move index files
+movefile(db,fullfile(doc,extractAfter(db,doc))) % move search database folder
 
 end 
 
