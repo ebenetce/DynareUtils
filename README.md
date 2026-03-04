@@ -41,7 +41,7 @@ A toolbox with various utilities to assist with the use of Dynare
 
 # Installation
 
-Get the latest version of the toolbox from the releases sectino in this repository, or run:
+Get the [latest version](https://github.com/ebenetce/DynareUtils/releases/latest/download/DynareUtils.mltbx) of the toolbox from the releases section in this repository, or run:
 
 ```matlab
 websave('DynareUtils.mltbx', 'https://github.com/ebenetce/DynareUtils/releases/latest/download/DynareUtils.mltbx')
