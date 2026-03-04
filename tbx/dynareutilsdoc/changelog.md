@@ -1,5 +1,9 @@
 # Release notes
 
+## Version 0.2.1
+
+* Documentation updates
+
 ## Version 0.2.0
 
 * Moved install setup to 7z
